@@ -1,4 +1,3 @@
-// pages/pain-and-gains.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -11,10 +10,11 @@ interface Exercise {
   reps: string;
 }
 
-interface DayLog {
-  date: string;
-  completed: Record<string, boolean>;
-}
+// Each day's log is a record of exercise name -> completion boolean
+type DayLog = Record<string, boolean>;
+
+// All logs: date string -> DayLog
+type Logs = Record<string, DayLog>;
 
 // 30-day plan (simplified example)
 const exercises: Exercise[] = [
@@ -27,12 +27,19 @@ const exercises: Exercise[] = [
 
 export default function PainAndGains() {
   const today = format(new Date(), "yyyy-MM-dd");
-  const [dayLogs, setDayLogs] = useState<Record<string, DayLog>>({});
+  const [dayLogs, setDayLogs] = useState<Logs>({});
 
   // Load from localStorage
   useEffect(() => {
     const stored = localStorage.getItem("painAndGainsLogs");
-    if (stored) setDayLogs(JSON.parse(stored));
+    if (stored) {
+      try {
+        const parsed: Logs = JSON.parse(stored);
+        setDayLogs(parsed);
+      } catch {
+        console.error("Failed to parse saved logs");
+      }
+    }
   }, []);
 
   // Save to localStorage
@@ -56,7 +63,7 @@ export default function PainAndGains() {
       {exercises.map(ex => (
         <div key={ex.name} className="flex items-center mb-2">
           <Checkbox
-            checked={dayLogs[today]?.[ex.name] || false}
+            checked={dayLogs[today]?.[ex.name] ?? false}
             onCheckedChange={() => toggleExercise(ex.name)}
           />
           <span className="ml-2">
