@@ -27,7 +27,7 @@ const exercises: Exercise[] = [
 
 export default function PainAndGains() {
   const today = format(new Date(), "yyyy-MM-dd");
-  const [dayLogs, setDayLogs] = useState<Record<string, Record<string, boolean>>>({});
+  const [dayLogs, setDayLogs] = useState<Record<string, DayLog>>({});
 
   // Load from localStorage
   useEffect(() => {
